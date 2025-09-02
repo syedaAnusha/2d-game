@@ -1,4 +1,4 @@
-import { Basket } from "../entities/basket";
+import { Basket } from "../entities/Basket";
 import { Vegetable } from "../entities/Vegetable";
 
 export class Game {
