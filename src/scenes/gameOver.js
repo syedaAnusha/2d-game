@@ -1,3 +1,5 @@
+import { assets } from "../assets";
+
 export class GameOver {
   constructor(canvas, ctx, gameState) {
     this.canvas = canvas;
@@ -6,7 +8,7 @@ export class GameOver {
 
     // Load background image
     this.backgroundImage = new Image();
-    this.backgroundImage.src = "/graphics/background.png";
+    this.backgroundImage.src = assets.background;
   }
 
   resize() {

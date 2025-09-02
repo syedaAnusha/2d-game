@@ -1,15 +1,16 @@
 import { Game } from "./scenes/Game";
 import { GameOver } from "./scenes/GameOver";
 import "./styles.css";
+import { assets } from "./assets";
 
 // Function to preload all images
 function preloadImages() {
   const images = [
-    "/graphics/basket.png",
-    "/graphics/tomato.png",
-    "/graphics/carrot.png",
-    "/graphics/eggplant.png",
-    "/graphics/background.png",
+    assets.basket,
+    assets.tomato,
+    assets.carrot,
+    assets.eggplant,
+    assets.background,
   ];
 
   const promises = images.map((src) => {

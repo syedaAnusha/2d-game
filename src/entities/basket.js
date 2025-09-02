@@ -1,4 +1,5 @@
 import { Entity } from "./Entity";
+import { assets } from "../assets";
 
 export class Basket extends Entity {
   constructor(canvas) {
@@ -18,7 +19,7 @@ export class Basket extends Entity {
     this.speed = isMobileScreen ? 7 : 10;
     this.canvas = canvas;
     this.image = new Image();
-    this.image.src = "/graphics/basket.png";
+    this.image.src = assets.basket;
     this.touchX = null;
   }
 

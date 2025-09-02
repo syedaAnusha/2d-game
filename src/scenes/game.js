@@ -1,5 +1,6 @@
 import { Basket } from "../entities/Basket";
 import { Vegetable } from "../entities/Vegetable";
+import { assets } from "../assets";
 
 export class Game {
   constructor(canvas, ctx, gameState) {
@@ -9,7 +10,7 @@ export class Game {
 
     // Load background image
     this.backgroundImage = new Image();
-    this.backgroundImage.src = "/graphics/background.png";
+    this.backgroundImage.src = assets.background;
 
     // Create player's basket
     this.basket = new Basket(canvas);

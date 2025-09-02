@@ -1,4 +1,5 @@
 import { Entity } from "./Entity";
+import { assets } from "../assets";
 
 export class Vegetable extends Entity {
   constructor(canvas, type) {
@@ -25,7 +26,7 @@ export class Vegetable extends Entity {
 
     // Load the appropriate image
     this.image = new Image();
-    this.image.src = `/graphics/${type}.png`;
+    this.image.src = assets[type];
 
     // Mark as active
     this.active = true;
