@@ -127,10 +127,10 @@ export class Game {
     const isMobileScreen = window.innerWidth < 768;
     const isVerySmallScreen = window.innerWidth < 360;
 
-    // Set responsive text sizes
-    const scoreFontSize = isVerySmallScreen ? 16 : isMobileScreen ? 20 : 24;
-    const targetFontSize = isVerySmallScreen ? 18 : isMobileScreen ? 24 : 28;
-    const lineWidth = isMobileScreen ? 2 : 3;
+    // Set responsive text sizes - reduced for better mobile display
+    const scoreFontSize = isVerySmallScreen ? 14 : isMobileScreen ? 16 : 24;
+    const targetFontSize = isVerySmallScreen ? 16 : isMobileScreen ? 20 : 28;
+    const lineWidth = isMobileScreen ? 1.5 : 3;
 
     // Set text styles
     this.ctx.fillStyle = "white";

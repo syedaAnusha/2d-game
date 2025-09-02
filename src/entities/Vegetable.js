@@ -5,10 +5,22 @@ export class Vegetable extends Entity {
   constructor(canvas, type) {
     // Check if on mobile screen
     const isMobileScreen = window.innerWidth < 768;
+    const isVerySmallScreen = window.innerWidth < 360;
 
     // Set initial vegetable dimensions responsive to screen size
-    const width = isMobileScreen ? Math.min(30, canvas.width * 0.1) : 40;
-    const height = isMobileScreen ? Math.min(30, canvas.width * 0.1) : 40;
+    // Ensure vegetables are visible enough on very small screens
+    let width, height;
+
+    if (isVerySmallScreen) {
+      width = Math.max(30, canvas.width * 0.12);
+      height = Math.max(30, canvas.width * 0.12);
+    } else if (isMobileScreen) {
+      width = Math.max(30, canvas.width * 0.1);
+      height = Math.max(30, canvas.width * 0.1);
+    } else {
+      width = 40;
+      height = 40;
+    }
 
     // Random x position
     const x = Math.random() * (canvas.width - width);

@@ -5,13 +5,26 @@ export class Basket extends Entity {
   constructor(canvas) {
     // Set initial basket dimensions and position based on screen size
     const isMobileScreen = window.innerWidth < 768;
+    const isVerySmallScreen = window.innerWidth < 360;
 
-    // Responsive sizing for basket
-    const width = isMobileScreen ? Math.min(70, canvas.width * 0.2) : 80;
-    const height = isMobileScreen ? Math.min(50, canvas.width * 0.15) : 60;
+    // Improved responsive sizing for basket
+    // Ensure the basket is visible and usable on very small screens
+    let width, height;
+
+    if (isVerySmallScreen) {
+      // For very small screens, use a larger percentage of screen width
+      width = Math.max(60, canvas.width * 0.25);
+      height = Math.max(45, canvas.width * 0.18);
+    } else if (isMobileScreen) {
+      width = Math.max(70, canvas.width * 0.22);
+      height = Math.max(50, canvas.width * 0.16);
+    } else {
+      width = 80;
+      height = 60;
+    }
 
     const x = canvas.width / 2 - width / 2;
-    const y = canvas.height - height - 10;
+    const y = canvas.height - height - 20; // Moved up slightly for better visibility
 
     super(x, y, width, height);
 
@@ -55,16 +68,28 @@ export class Basket extends Entity {
     const basketCenter = this.x + this.width / 2;
     const distance = x - basketCenter;
 
-    // Apply movement based on touch position
-    if (Math.abs(distance) > 5) {
-      // Small threshold to prevent jittering
-      if (distance > 0) {
-        this.moveRight();
-      } else {
-        this.moveLeft();
-      }
+    // Adjust basket position directly for smoother mobile control
+    const isMobileScreen = window.innerWidth < 768;
+
+    if (isMobileScreen) {
+      // Direct positioning for better mobile responsiveness
+      this.x = Math.max(
+        0,
+        Math.min(this.canvas.width - this.width, x - this.width / 2)
+      );
+      this.speedX = 0; // Stop any momentum-based movement
     } else {
-      this.stopMoving();
+      // Apply momentum-based movement for desktop
+      if (Math.abs(distance) > 5) {
+        // Small threshold to prevent jittering
+        if (distance > 0) {
+          this.moveRight();
+        } else {
+          this.moveLeft();
+        }
+      } else {
+        this.stopMoving();
+      }
     }
   }
 
