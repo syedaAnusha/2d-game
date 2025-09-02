@@ -1,105 +1,229 @@
-import k from "../kaplayCtx";
-import { makeBasket } from "../entities/basket";
-import { makeOrange, makeMango } from "../entities/fruit";
+import { Basket } from "../entities/basket";
+import { Vegetable } from "../entities/Vegetable";
 
-export default function game() {
-  // Background music
-  const bgMusic = k.play("bgMusic", { volume: 0.2, loop: true });
+export class Game {
+  constructor(canvas, ctx, gameState) {
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.gameState = gameState;
 
-  // Game variables
-  let score = 0;
-  let gameSpeed = 1;
-  let colorChangeTimer = 0;
+    // Load background image
+    this.backgroundImage = new Image();
+    this.backgroundImage.src = "/graphics/background.png";
 
-  // Background
-  const bg = k.add([k.sprite("background"), k.scale(1), k.pos(0, 0)]);
+    // Create player's basket
+    this.basket = new Basket(canvas);
 
-  // Add score display
-  const scoreText = k.add([
-    k.text("SCORE: 0", { size: 48, font: "gameFont" }),
-    k.pos(20, 20),
-  ]);
+    // Vegetables container
+    this.vegetables = [];
 
-  // Create basket
-  const basket = makeBasket(k.vec2(k.center().x, k.height() - 100));
+    // Vegetable types
+    this.vegetableTypes = ["tomato", "carrot", "eggplant"];
 
-  // Basket controls
-  k.onKeyDown("left", () => {
-    if (basket.pos.x > 50) basket.move(-500, 0);
-  });
+    // Timers
+    this.lastVegetableTime = 0;
+    this.vegetableSpawnInterval = 800; // in milliseconds
+    this.lastTimerUpdate = Date.now();
 
-  k.onKeyDown("right", () => {
-    if (basket.pos.x < k.width() - 50) basket.move(500, 0);
-  });
+    // Set the initial target vegetable
+    this.setRandomTargetVegetable();
 
-  // Touch/mouse controls for mobile
-  k.onMouseMove((pos) => {
-    basket.pos.x = pos.x;
-  });
+    // Timer to update the target vegetable every few seconds
+    this.targetUpdateInterval = setInterval(() => {
+      this.setRandomTargetVegetable();
+    }, 5000); // Change target every 5 seconds
 
-  // Randomly change basket color
-  k.loop(3, () => {
-    basket.changeColor();
-  });
+    // Start the game timer
+    this.startTimer();
+  }
 
-  // Spawn fruits
-  const spawnFruit = () => {
-    const fruitType = k.rand(0, 1) > 0.5 ? "mango" : "orange";
-    const xPos = k.rand(50, k.width() - 50);
+  resize() {
+    // Adjust basket position on resize
+    this.basket.y = this.canvas.height - this.basket.height - 10;
+  }
 
-    if (fruitType === "mango") {
-      const mango = makeMango(k.vec2(xPos, -50));
-      setFruitBehavior(mango);
-    } else {
-      const orange = makeOrange(k.vec2(xPos, -50));
-      setFruitBehavior(orange);
+  update() {
+    // Update the basket
+    this.basket.update();
+
+    // Spawn new vegetables
+    const currentTime = Date.now();
+    if (currentTime - this.lastVegetableTime > this.vegetableSpawnInterval) {
+      this.lastVegetableTime = currentTime;
+
+      // Random vegetable type
+      const randomType =
+        this.vegetableTypes[
+          Math.floor(Math.random() * this.vegetableTypes.length)
+        ];
+      this.vegetables.push(new Vegetable(this.canvas, randomType));
     }
 
-    // Increase difficulty over time
-    const waitTime = k.rand(0.5, 2) / gameSpeed;
-    k.wait(waitTime, spawnFruit);
-  };
+    // Update vegetables
+    for (let i = this.vegetables.length - 1; i >= 0; i--) {
+      const vegetable = this.vegetables[i];
+      vegetable.update();
 
-  const setFruitBehavior = (fruit) => {
-    // When fruit goes off screen
-    fruit.onUpdate(() => {
-      if (fruit.pos.y > k.height() + 50) {
-        k.destroy(fruit);
-        // Optional: penalty for missing
+      // Check collision with basket
+      if (vegetable.active && vegetable.collidesWith(this.basket)) {
+        vegetable.active = false;
+
+        // Update score based on target vegetable
+        if (vegetable.type === this.gameState.targetVegetable) {
+          this.gameState.score += 10;
+        } else {
+          this.gameState.score -= 5;
+        }
+
+        // Remove the vegetable
+        this.vegetables.splice(i, 1);
       }
-    });
-  };
 
-  // Collision detection
-  k.onCollide("fruit", "basket", (fruit, basket) => {
-    // Check if basket color matches fruit type
-    const correctCatch =
-      (fruit.is("orange") && basket.currentColor === "orange") ||
-      (fruit.is("mango") && basket.currentColor === "yellow");
-
-    if (correctCatch) {
-      k.play("catch", { volume: 0.5 });
-      score += 10;
-      scoreText.text = `SCORE: ${score}`;
-    } else {
-      k.play("wrong", { volume: 0.5 });
-      // Optional: penalty for wrong color
+      // Remove inactive vegetables
+      if (!vegetable.active) {
+        this.vegetables.splice(i, 1);
+      }
     }
 
-    k.destroy(fruit);
-  });
+    // Update timer
+    this.updateTimer();
+  }
 
-  // Start game
-  spawnFruit();
+  render() {
+    // Clear the canvas
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-  // Increase game speed over time
-  k.loop(10, () => {
-    gameSpeed += 0.1;
-  });
+    // Draw background image
+    if (this.backgroundImage.complete) {
+      // Draw the background image covering the entire canvas
+      this.ctx.drawImage(
+        this.backgroundImage,
+        0,
+        0,
+        this.canvas.width,
+        this.canvas.height
+      );
+    } else {
+      // Fallback if image isn't loaded yet
+      this.ctx.fillStyle = "#87CEEB"; // Sky blue background
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
-  // Game over condition
-  k.onKeyPress("escape", () => {
-    k.setData("current-score", score);
-    k.go("game-over", bgMusic);
-  });
+    // Render all vegetables
+    for (const vegetable of this.vegetables) {
+      vegetable.render(this.ctx);
+    }
+
+    // Render the basket
+    this.basket.render(this.ctx);
+
+    // Render the UI (score, timer, target)
+    this.renderUI();
+  }
+
+  renderUI() {
+    // Check for mobile screen
+    const isMobileScreen = window.innerWidth < 768;
+    const isVerySmallScreen = window.innerWidth < 360;
+
+    // Set responsive text sizes
+    const scoreFontSize = isVerySmallScreen ? 16 : isMobileScreen ? 20 : 24;
+    const targetFontSize = isVerySmallScreen ? 18 : isMobileScreen ? 24 : 28;
+    const lineWidth = isMobileScreen ? 2 : 3;
+
+    // Set text styles
+    this.ctx.fillStyle = "white";
+    this.ctx.strokeStyle = "black";
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.font = `${scoreFontSize}px Arial`;
+
+    // Score
+    this.ctx.textAlign = "left";
+    const scoreX = isVerySmallScreen ? 10 : 20;
+    const textY = isVerySmallScreen ? 25 : 40;
+    this.ctx.strokeText(`Score: ${this.gameState.score}`, scoreX, textY);
+    this.ctx.fillText(`Score: ${this.gameState.score}`, scoreX, textY);
+
+    // Timer
+    this.ctx.textAlign = "right";
+    const timerX = this.canvas.width - (isVerySmallScreen ? 10 : 20);
+    this.ctx.strokeText(`Time: ${this.gameState.timeLeft}s`, timerX, textY);
+    this.ctx.fillText(`Time: ${this.gameState.timeLeft}s`, timerX, textY);
+
+    // Target vegetable
+    this.ctx.textAlign = "center";
+    this.ctx.font = `${targetFontSize}px Arial`;
+    this.ctx.strokeText(
+      `Catch: ${this.gameState.targetVegetable.toUpperCase()}`,
+      this.canvas.width / 2,
+      textY
+    );
+    this.ctx.fillText(
+      `Catch: ${this.gameState.targetVegetable.toUpperCase()}`,
+      this.canvas.width / 2,
+      textY
+    );
+  }
+
+  setRandomTargetVegetable() {
+    const randomIndex = Math.floor(Math.random() * this.vegetableTypes.length);
+    this.gameState.targetVegetable = this.vegetableTypes[randomIndex];
+  }
+
+  startTimer() {
+    this.lastTimerUpdate = Date.now();
+  }
+
+  updateTimer() {
+    const currentTime = Date.now();
+    const deltaTime = currentTime - this.lastTimerUpdate;
+
+    // Update timer every second
+    if (deltaTime >= 1000) {
+      this.gameState.timeLeft--;
+      this.lastTimerUpdate = currentTime;
+
+      // Check if time is up
+      if (this.gameState.timeLeft <= 0) {
+        this.gameState.timeLeft = 0;
+        this.endGame();
+      }
+    }
+  }
+
+  endGame() {
+    // Clear the target update interval
+    clearInterval(this.targetUpdateInterval);
+
+    // Determine if player won (positive score)
+    this.gameState.win = this.gameState.score > 0;
+
+    // Set game over state
+    this.gameState.gameOver = true;
+  }
+
+  handleKeyDown(e) {
+    switch (e.key) {
+      case "ArrowLeft":
+        this.basket.moveLeft();
+        break;
+      case "ArrowRight":
+        this.basket.moveRight();
+        break;
+    }
+  }
+
+  handleTouchStart(e) {
+    const touch = e.touches[0];
+    this.basket.setTouchPosition(touch.clientX);
+  }
+
+  handleTouchMove(e) {
+    const touch = e.touches[0];
+    this.basket.setTouchPosition(touch.clientX);
+  }
+
+  handleTouchEnd() {
+    this.basket.releaseTouchPosition();
+  }
 }

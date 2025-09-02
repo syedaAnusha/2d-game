@@ -1,46 +1,137 @@
-import k from "../kaplayCtx";
+export class GameOver {
+  constructor(canvas, ctx, gameState) {
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.gameState = gameState;
 
-export default function gameOver(bgMusic) {
-  // Stop background music
-  bgMusic.paused = true;
-
-  // Get scores
-  let bestScore = k.getData("best-score") || 0;
-  const currentScore = k.getData("current-score");
-
-  // Update best score if needed
-  if (bestScore < currentScore) {
-    k.setData("best-score", currentScore);
-    bestScore = currentScore;
+    // Load background image
+    this.backgroundImage = new Image();
+    this.backgroundImage.src = "/graphics/background.png";
   }
 
-  // Display game over text
-  k.add([
-    k.text("GAME OVER", { font: "gameFont", size: 96 }),
-    k.anchor("center"),
-    k.pos(k.center().x, k.center().y - 200),
-  ]);
+  resize() {
+    // No specific resize actions needed
+  }
 
-  // Display scores
-  k.add([
-    k.text(`BEST SCORE: ${bestScore}`, { font: "gameFont", size: 64 }),
-    k.anchor("center"),
-    k.pos(k.center().x, k.center().y - 50),
-  ]);
+  update() {
+    // No update logic needed for game over screen
+  }
 
-  k.add([
-    k.text(`CURRENT SCORE: ${currentScore}`, { font: "gameFont", size: 64 }),
-    k.anchor("center"),
-    k.pos(k.center().x, k.center().y + 50),
-  ]);
+  render() {
+    // Clear the canvas
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-  // Play again button
-  k.add([
-    k.text("Click/Tap to Play Again", { font: "gameFont", size: 48 }),
-    k.anchor("center"),
-    k.pos(k.center().x, k.center().y + 200),
-  ]);
+    // Draw background image with a darkening overlay
+    if (this.backgroundImage.complete) {
+      // Draw the background image
+      this.ctx.drawImage(
+        this.backgroundImage,
+        0,
+        0,
+        this.canvas.width,
+        this.canvas.height
+      );
 
-  // Click/tap to restart
-  k.onClick(() => k.go("game"));
+      // Add a semi-transparent dark overlay to make text more readable
+      this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)"; // Semi-transparent black
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    } else {
+      // Fallback if image isn't loaded
+      this.ctx.fillStyle = "#2C3E50"; // Dark blue background
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    // Check for mobile screen
+    const isMobileScreen = window.innerWidth < 768;
+    const isVerySmallScreen = window.innerWidth < 360;
+
+    // Set responsive text sizes
+    const gameOverFontSize = isVerySmallScreen ? 32 : isMobileScreen ? 40 : 48;
+    const resultFontSize = isVerySmallScreen ? 24 : isMobileScreen ? 30 : 36;
+    const scoreFontSize = isVerySmallScreen ? 18 : isMobileScreen ? 24 : 30;
+    const instructionFontSize = isVerySmallScreen
+      ? 14
+      : isMobileScreen
+      ? 18
+      : 24;
+    const lineWidth = isMobileScreen ? 2 : 3;
+    const verticalSpacing = isMobileScreen ? 40 : 60;
+
+    // Set text styles
+    this.ctx.fillStyle = "white";
+    this.ctx.strokeStyle = "black";
+    this.ctx.lineWidth = lineWidth;
+    this.ctx.textAlign = "center";
+
+    // Game over text
+    this.ctx.font = `${gameOverFontSize}px Arial`;
+    this.ctx.strokeText(
+      "GAME OVER",
+      this.canvas.width / 2,
+      this.canvas.height / 2 - verticalSpacing
+    );
+    this.ctx.fillText(
+      "GAME OVER",
+      this.canvas.width / 2,
+      this.canvas.height / 2 - verticalSpacing
+    );
+
+    // Win or lose message
+    this.ctx.font = `${resultFontSize}px Arial`;
+    const resultMessage = this.gameState.score > 0 ? "You Win!" : "You Lose!";
+    this.ctx.strokeText(
+      resultMessage,
+      this.canvas.width / 2,
+      this.canvas.height / 2
+    );
+    this.ctx.fillText(
+      resultMessage,
+      this.canvas.width / 2,
+      this.canvas.height / 2
+    );
+
+    // Final score
+    this.ctx.font = `${scoreFontSize}px Arial`;
+    const scoreVerticalSpacing = isMobileScreen ? 40 : 60;
+    this.ctx.strokeText(
+      `Final Score: ${this.gameState.score}`,
+      this.canvas.width / 2,
+      this.canvas.height / 2 + scoreVerticalSpacing
+    );
+    this.ctx.fillText(
+      `Final Score: ${this.gameState.score}`,
+      this.canvas.width / 2,
+      this.canvas.height / 2 + scoreVerticalSpacing
+    );
+
+    // Restart instructions
+    this.ctx.font = `${instructionFontSize}px Arial`;
+    const instructionVerticalSpacing = isMobileScreen ? 80 : 120;
+    this.ctx.strokeText(
+      "Refresh the page to play again",
+      this.canvas.width / 2,
+      this.canvas.height / 2 + instructionVerticalSpacing
+    );
+    this.ctx.fillText(
+      "Refresh the page to play again",
+      this.canvas.width / 2,
+      this.canvas.height / 2 + instructionVerticalSpacing
+    );
+  }
+
+  handleKeyDown() {
+    // No keyboard handling needed for game over screen
+  }
+
+  handleTouchStart() {
+    // No touch handling needed for game over screen
+  }
+
+  handleTouchMove() {
+    // No touch handling needed for game over screen
+  }
+
+  handleTouchEnd() {
+    // No touch handling needed for game over screen
+  }
 }
