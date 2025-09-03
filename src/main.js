@@ -5,19 +5,34 @@ import { assets } from "./assets";
 
 // Function to preload all images
 function preloadImages() {
-  const images = [
-    assets.basket,
-    assets.tomato,
-    assets.carrot,
-    assets.eggplant,
-    assets.background,
-  ];
+  const imageAssets = {
+    basket: assets.basket,
+    tomato: assets.tomato,
+    carrot: assets.carrot,
+    eggplant: assets.eggplant,
+    background: assets.background,
+    vegetable: assets.vegetable,
+  };
 
-  const promises = images.map((src) => {
+  console.log("Image assets to load:", imageAssets);
+
+  const promises = Object.entries(imageAssets).map(([key, src]) => {
     return new Promise((resolve, reject) => {
+      if (!src) {
+        console.error(`Missing image source for: ${key}`);
+        reject(`Missing image source for: ${key}`);
+        return;
+      }
+
       const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(`Failed to load image: ${src}`);
+      img.onload = () => {
+        console.log(`Successfully loaded: ${key}`);
+        resolve(img);
+      };
+      img.onerror = () => {
+        console.error(`Failed to load image: ${key} (${src})`);
+        reject(`Failed to load image: ${key} (${src})`);
+      };
       img.src = src;
     });
   });
@@ -117,7 +132,13 @@ window.addEventListener("DOMContentLoaded", () => {
     })
     .catch((error) => {
       console.error("Error loading game assets:", error);
-      document.getElementById("loading").textContent =
-        "Error loading game assets. Please refresh.";
+      const loadingElement = document.getElementById("loading");
+      if (loadingElement) {
+        loadingElement.innerHTML = `Error loading game assets: ${error}<br>Please check the console for details and refresh.`;
+        loadingElement.style.display = "block";
+        loadingElement.style.color = "red";
+        loadingElement.style.padding = "20px";
+        loadingElement.style.backgroundColor = "rgba(0,0,0,0.7)";
+      }
     });
 });

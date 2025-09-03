@@ -23,4 +23,9 @@ canvas {
   color: white;
   font-size: 24px;
   z-index: 100;
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  max-width: 80%;
 }

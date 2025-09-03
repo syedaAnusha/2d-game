@@ -26,13 +26,21 @@ export class Basket extends Entity {
     const x = canvas.width / 2 - width / 2;
     const y = canvas.height - height - 20; // Moved up slightly for better visibility
 
+    // Call super constructor first
     super(x, y, width, height);
 
     // Responsive speed based on screen width
     this.speed = isMobileScreen ? 7 : 10;
     this.canvas = canvas;
     this.image = new Image();
-    this.image.src = assets.basket;
+
+    if (!assets.basket) {
+      console.error("Basket asset not found!");
+      console.log("Available assets:", assets);
+    } else {
+      this.image.src = assets.basket;
+    }
+
     this.touchX = null;
   }
 

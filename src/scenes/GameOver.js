@@ -8,7 +8,12 @@ export class GameOver {
 
     // Load background image
     this.backgroundImage = new Image();
-    this.backgroundImage.src = assets.background;
+    if (!assets.background) {
+      console.error("Background asset not found in GameOver!");
+      console.log("Available assets:", assets);
+    } else {
+      this.backgroundImage.src = assets.background;
+    }
   }
 
   resize() {

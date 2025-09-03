@@ -6,6 +6,16 @@ import eggplantImg from "../graphics/eggplant.png";
 import backgroundImg from "../graphics/background.png";
 import vegetableImg from "../graphics/vegetable.png";
 
+// Log asset imports to verify they're loaded correctly
+console.log("Asset imports:", {
+  basketImg,
+  tomatoImg,
+  carrotImg,
+  eggplantImg,
+  backgroundImg,
+  vegetableImg,
+});
+
 // Export all assets as a single object
 export const assets = {
   basket: basketImg,

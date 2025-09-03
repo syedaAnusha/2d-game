@@ -28,6 +28,7 @@ export class Vegetable extends Entity {
     // Start from top of the screen
     const y = -height;
 
+    // Call super constructor first
     super(x, y, width, height);
 
     this.type = type; // 'tomato', 'carrot', or 'eggplant'
@@ -38,7 +39,14 @@ export class Vegetable extends Entity {
 
     // Load the appropriate image
     this.image = new Image();
-    this.image.src = assets[type];
+    if (!assets[type]) {
+      console.error(`No asset found for vegetable type: ${type}`);
+      console.log("Available assets:", assets);
+      // Fallback to generic vegetable image
+      this.image.src = assets.vegetable;
+    } else {
+      this.image.src = assets[type];
+    }
 
     // Mark as active
     this.active = true;

@@ -8,9 +8,15 @@ export class Game {
     this.ctx = ctx;
     this.gameState = gameState;
 
+    console.log("Game initialized with assets:", assets);
+
     // Load background image
     this.backgroundImage = new Image();
-    this.backgroundImage.src = assets.background;
+    if (!assets.background) {
+      console.error("Background asset not found!");
+    } else {
+      this.backgroundImage.src = assets.background;
+    }
 
     // Create player's basket
     this.basket = new Basket(canvas);
@@ -168,7 +174,9 @@ export class Game {
 
   setRandomTargetVegetable() {
     const randomIndex = Math.floor(Math.random() * this.vegetableTypes.length);
-    this.gameState.targetVegetable = this.vegetableTypes[randomIndex];
+    const selectedType = this.vegetableTypes[randomIndex];
+    console.log("Selected target vegetable:", selectedType);
+    this.gameState.targetVegetable = selectedType;
   }
 
   startTimer() {
