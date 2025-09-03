@@ -232,6 +232,9 @@ k.scene("game-over", () => {
     k.onButtonPress(() => {
       k.go("game");
     });
+    k.onKeyPress("space", () => {
+      k.go("game");
+    });
   });
 });
 k.go("game");
