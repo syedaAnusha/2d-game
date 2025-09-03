@@ -1,7 +1,7 @@
 import k from "./kaplayCtx";
-import { makeSonic, makeRing, makeEnemy } from "./entities";
+import { makeSonic, makeRing, makeEnemy, makeEggplant } from "./entities";
 
-k.loadSprite("chemical-bg", "graphics/chemical-bg.png");
+k.loadSprite("forest", "graphics/forest.jpg");
 k.loadSprite("platforms", "graphics/platforms.png");
 k.loadSprite("sonic", "graphics/sonic.png", {
   sliceX: 8, // this refers to number of columns in sprite image
@@ -11,13 +11,23 @@ k.loadSprite("sonic", "graphics/sonic.png", {
     jump: { from: 8, to: 15, loop: true, speed: 90 },
   },
 });
-k.loadSprite("ring", "graphics/ring.png", {
-  sliceX: 16, // this refers to number of columns in sprite image
+
+k.loadSprite("ring", "graphics/carrot.png", {
+  sliceX: 1, // this refers to number of columns in sprite image
   sliceY: 1, // this refers to number of rows in sprite image
   anims: {
-    spin: { from: 0, to: 15, loop: true, speed: 20 },
+    spin: { from: 0, to: 0, loop: true, speed: 20 },
   },
 });
+
+k.loadSprite("eggplant", "graphics/eggplant.png", {
+  sliceX: 1, // this refers to number of columns in sprite image
+  sliceY: 1, // this refers to number of rows in sprite image
+  anims: {
+    spin: { from: 0, to: 0, loop: true, speed: 20 },
+  },
+});
+
 k.loadSprite("bug", "graphics/motobug.png", {
   sliceX: 5, // this refers to number of columns in sprite image
   sliceY: 1, // this refers to number of rows in sprite image
@@ -56,21 +66,22 @@ k.scene("game", () => {
     k.pos(15, 20),
     k.z(2),
   ]);
-  // Setting background object
+  // Setting background object - adding three pieces for smoother looping
   const bgPieces = [
+    k.add([k.sprite("forest"), k.pos(0, 0), k.scale(2), k.z(1), k.opacity(1)]),
     k.add([
-      k.sprite("chemical-bg"),
-      k.pos(0, 0),
+      k.sprite("forest"),
+      k.pos(bgPieceWidth, 0),
       k.scale(2),
       k.z(1),
       k.opacity(1),
     ]),
     k.add([
-      k.sprite("chemical-bg"),
-      k.pos(bgPieceWidth, 0),
-      k.opacity(1),
+      k.sprite("forest"),
+      k.pos(bgPieceWidth * 2, 0),
       k.scale(2),
       k.z(1),
+      k.opacity(1),
     ]),
   ];
   const platforms = [
@@ -87,35 +98,37 @@ k.scene("game", () => {
     k.body({ isStatic: true }),
   ]);
   k.onUpdate(() => {
-    // code for city background
-    if (bgPieces[1].pos.x < 0) {
-      bgPieces[0].moveTo(bgPieces[1].pos.x + bgPieceWidth * 2, 0);
-      const frontBgPiece = bgPieces.shift();
-      if (frontBgPiece) bgPieces.push(frontBgPiece);
-    }
-    bgPieces[0].move(-100, 0);
-    bgPieces[1].moveTo(bgPieces[0].pos.x + bgPieceWidth * 2, 0);
+    // Further improved background looping logic with three pieces
+    // Move all background pieces at the same constant speed
+    const bgSpeed = 100;
 
-    if (platforms[1].pos.x < 0) {
-      platforms[0].moveTo(
-        platforms[1].pos.x + platformWidth,
-        platforms[1].pos.y
-      );
-      const frontPlatform = platforms.shift();
-      if (frontPlatform) platforms.push(frontPlatform);
+    bgPieces.forEach((piece) => {
+      piece.move(-bgSpeed, 0);
+    });
+
+    // Check if the first piece has moved completely off screen
+    if (bgPieces[0].pos.x <= -bgPieceWidth) {
+      // Move the first piece to the end of the line (after the third piece)
+      const firstPiece = bgPieces.shift();
+      bgPieces.push(firstPiece);
+      firstPiece.pos.x = bgPieces[bgPieces.length - 2].pos.x + bgPieceWidth;
     }
+
+    // Improved platform looping logic
     platforms[0].move(-gameSpeed, 0);
-    platforms[1].moveTo(platforms[0].pos.x + platformWidth, platforms[0].pos.y);
+    platforms[1].move(-gameSpeed, 0);
+
+    // Check if the first platform has moved completely off screen
+    if (platforms[0].pos.x <= -platformWidth) {
+      // Reposition the first platform to be after the second platform
+      platforms[0].pos.x = platforms[1].pos.x + platformWidth;
+      // Swap the platforms in the array
+      [platforms[0], platforms[1]] = [platforms[1], platforms[0]];
+    }
   });
 
   const spawnRing = () => {
     const ring = makeRing(k.vec2(1280, 610));
-    sonic.onCollide("ring", (r) => {
-      k.play("ring", { volume: 0.5 });
-      k.destroy(r);
-      score++;
-      scoreText.text = `SCORE : ${score}`;
-    });
     ring.onUpdate(() => {
       // code to make the ring move or animate
       ring.move(-gameSpeed, 0);
@@ -127,6 +140,24 @@ k.scene("game", () => {
     k.wait(waitTime, spawnRing);
   };
   spawnRing();
+
+  const spawnEggplant = () => {
+    // Position eggplants higher in the air (y value is lower)
+    const yPosition = k.rand(30, 100); // Random height between 400-500 (above ground level)
+    const eggplant = makeEggplant(k.vec2(1280, yPosition));
+
+    eggplant.onUpdate(() => {
+      eggplant.move(-gameSpeed, 0);
+    });
+
+    eggplant.onExitScreen(() => {
+      k.destroy(eggplant);
+    });
+
+    const waitTime = k.rand(1, 4); // Slightly longer wait time than rings
+    k.wait(waitTime, spawnEggplant);
+  };
+  spawnEggplant();
 
   const spawnBug = () => {
     const motobug = makeEnemy(k.vec2(1280, 595));
@@ -147,7 +178,25 @@ k.scene("game", () => {
   spawnBug();
 
   sonic.onCollide("ring", (r) => {
+    k.play("ring", { volume: 0.5 });
+    k.destroy(r);
+    score++;
+    scoreText.text = `SCORE : ${score}`;
+
     ringCollectUI.text = "+1";
+    k.wait(1, () => {
+      ringCollectUI.text = "";
+    });
+  });
+
+  sonic.onCollide("eggplant", (e) => {
+    k.play("ring", { volume: 0.5 }); // Reusing ring sound
+    k.destroy(e);
+    score += 2; // Eggplants worth more points
+    scoreText.text = `SCORE : ${score}`;
+
+    // Show +2 text when collecting an eggplant
+    ringCollectUI.text = "+2";
     k.wait(1, () => {
       ringCollectUI.text = "";
     });

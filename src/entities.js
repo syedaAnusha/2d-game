@@ -51,6 +51,19 @@ export function makeRing(position) {
   ]);
 }
 
+export function makeEggplant(position) {
+  return k.add([
+    k.sprite("eggplant", { anim: "spin" }),
+    k.area(),
+    k.scale(3),
+    k.anchor("center"),
+    k.pos(position),
+    k.offscreen(),
+    k.z(5),
+    "eggplant",
+  ]);
+}
+
 export function makeEnemy(position) {
   return k.add([
     k.sprite("bug", { anim: "run" }),
