@@ -10,19 +10,18 @@ export class Vegetable extends Entity {
     // Set initial vegetable dimensions responsive to screen size
     // Ensure vegetables are visible enough on very small screens
     let width, height;
-
+    
     if (isVerySmallScreen) {
-      width = Math.max(30, canvas.width * 0.12);
-      height = Math.max(30, canvas.width * 0.12);
+      // Make vegetables even bigger on very small screens
+      width = Math.max(40, canvas.width * 0.15);
+      height = Math.max(40, canvas.width * 0.15);
     } else if (isMobileScreen) {
-      width = Math.max(30, canvas.width * 0.1);
-      height = Math.max(30, canvas.width * 0.1);
+      width = Math.max(35, canvas.width * 0.12);
+      height = Math.max(35, canvas.width * 0.12);
     } else {
       width = 40;
       height = 40;
-    }
-
-    // Random x position
+    }    // Random x position
     const x = Math.random() * (canvas.width - width);
 
     // Start from top of the screen
