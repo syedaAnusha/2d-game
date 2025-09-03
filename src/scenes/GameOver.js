@@ -47,17 +47,17 @@ export class GameOver {
     const isMobileScreen = window.innerWidth < 768;
     const isVerySmallScreen = window.innerWidth < 360;
 
-    // Set responsive text sizes - further improved for better mobile display
-    const gameOverFontSize = isVerySmallScreen ? 24 : isMobileScreen ? 32 : 48;
-    const resultFontSize = isVerySmallScreen ? 18 : isMobileScreen ? 22 : 36;
-    const scoreFontSize = isVerySmallScreen ? 14 : isMobileScreen ? 18 : 30;
+    // Set responsive text sizes - improved for better mobile display
+    const gameOverFontSize = isVerySmallScreen ? 28 : isMobileScreen ? 36 : 48;
+    const resultFontSize = isVerySmallScreen ? 20 : isMobileScreen ? 26 : 36;
+    const scoreFontSize = isVerySmallScreen ? 16 : isMobileScreen ? 20 : 30;
     const instructionFontSize = isVerySmallScreen
-      ? 10
+      ? 12
       : isMobileScreen
-      ? 14
+      ? 16
       : 24;
-    const lineWidth = isMobileScreen ? 1 : 3;
-    const verticalSpacing = isVerySmallScreen ? 25 : isMobileScreen ? 30 : 60;
+    const lineWidth = isMobileScreen ? 1.5 : 3;
+    const verticalSpacing = isVerySmallScreen ? 30 : isMobileScreen ? 35 : 60;
 
     // Set text styles
     this.ctx.fillStyle = "white";

@@ -10,21 +10,23 @@ export class Basket extends Entity {
     // Improved responsive sizing for basket
     // Ensure the basket is visible and usable on very small screens
     let width, height;
-    
+
     if (isVerySmallScreen) {
-      // Significantly larger for very small screens to ensure visibility
-      width = Math.max(70, canvas.width * 0.3);
-      height = Math.max(55, canvas.width * 0.22);
+      // For very small screens, use a larger percentage of screen width
+      width = Math.max(60, canvas.width * 0.25);
+      height = Math.max(45, canvas.width * 0.18);
     } else if (isMobileScreen) {
-      width = Math.max(80, canvas.width * 0.25);
-      height = Math.max(60, canvas.width * 0.2);
+      width = Math.max(70, canvas.width * 0.22);
+      height = Math.max(50, canvas.width * 0.16);
     } else {
       width = 80;
       height = 60;
     }
 
     const x = canvas.width / 2 - width / 2;
-    const y = canvas.height - height - 30; // Moved up more for better visibility on mobile    super(x, y, width, height);
+    const y = canvas.height - height - 20; // Moved up slightly for better visibility
+
+    super(x, y, width, height);
 
     // Responsive speed based on screen width
     this.speed = isMobileScreen ? 7 : 10;
@@ -44,28 +46,7 @@ export class Basket extends Entity {
   }
 
   render(ctx) {
-    // For mobile screens, add a subtle highlight around the basket for better visibility
-    const isMobileScreen = window.innerWidth < 768;
-    
-    if (isMobileScreen) {
-      // Add a subtle glow/highlight effect around the basket
-      ctx.save();
-      
-      // Draw a subtle shadow or highlight around the basket
-      const glowSize = 5;
-      ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-      ctx.shadowBlur = 10;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
-      
-      // Draw the basket with the glow effect
-      ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-      
-      ctx.restore();
-    } else {
-      // Standard rendering for desktop
-      ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-    }
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 
   moveLeft() {

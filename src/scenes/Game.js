@@ -127,10 +127,10 @@ export class Game {
     const isMobileScreen = window.innerWidth < 768;
     const isVerySmallScreen = window.innerWidth < 360;
 
-    // Set responsive text sizes - significantly reduced for mobile to prevent overlap
-    const scoreFontSize = isVerySmallScreen ? 12 : isMobileScreen ? 14 : 24;
-    const targetFontSize = isVerySmallScreen ? 12 : isMobileScreen ? 16 : 28;
-    const lineWidth = isMobileScreen ? 1 : 3;
+    // Set responsive text sizes - reduced for better mobile display
+    const scoreFontSize = isVerySmallScreen ? 14 : isMobileScreen ? 16 : 24;
+    const targetFontSize = isVerySmallScreen ? 16 : isMobileScreen ? 20 : 28;
+    const lineWidth = isMobileScreen ? 1.5 : 3;
 
     // Set text styles
     this.ctx.fillStyle = "white";
@@ -138,64 +138,32 @@ export class Game {
     this.ctx.lineWidth = lineWidth;
     this.ctx.font = `${scoreFontSize}px Arial`;
 
-    // For mobile screens, arrange UI elements differently to prevent overlap
-    if (isMobileScreen) {
-      // Score - top left
-      this.ctx.textAlign = "left";
-      const scoreX = 5; // Move closer to the edge
-      const textY = isVerySmallScreen ? 20 : 25;
-      this.ctx.strokeText(`Score: ${this.gameState.score}`, scoreX, textY);
-      this.ctx.fillText(`Score: ${this.gameState.score}`, scoreX, textY);
+    // Score
+    this.ctx.textAlign = "left";
+    const scoreX = isVerySmallScreen ? 10 : 20;
+    const textY = isVerySmallScreen ? 25 : 40;
+    this.ctx.strokeText(`Score: ${this.gameState.score}`, scoreX, textY);
+    this.ctx.fillText(`Score: ${this.gameState.score}`, scoreX, textY);
 
-      // Timer - top right
-      this.ctx.textAlign = "right";
-      const timerX = this.canvas.width - 5; // Move closer to the edge
-      this.ctx.strokeText(`${this.gameState.timeLeft}s`, timerX, textY);
-      this.ctx.fillText(`${this.gameState.timeLeft}s`, timerX, textY);
+    // Timer
+    this.ctx.textAlign = "right";
+    const timerX = this.canvas.width - (isVerySmallScreen ? 10 : 20);
+    this.ctx.strokeText(`Time: ${this.gameState.timeLeft}s`, timerX, textY);
+    this.ctx.fillText(`Time: ${this.gameState.timeLeft}s`, timerX, textY);
 
-      // Target vegetable - center but lower
-      this.ctx.textAlign = "center";
-      this.ctx.font = `${targetFontSize}px Arial`;
-      const targetY = textY + (isVerySmallScreen ? 18 : 24); // Position below other elements
-      this.ctx.strokeText(
-        `Catch: ${this.gameState.targetVegetable}`,
-        this.canvas.width / 2,
-        targetY
-      );
-      this.ctx.fillText(
-        `Catch: ${this.gameState.targetVegetable}`,
-        this.canvas.width / 2,
-        targetY
-      );
-    } else {
-      // Desktop layout - remains the same
-      // Score
-      this.ctx.textAlign = "left";
-      const scoreX = 20;
-      const textY = 40;
-      this.ctx.strokeText(`Score: ${this.gameState.score}`, scoreX, textY);
-      this.ctx.fillText(`Score: ${this.gameState.score}`, scoreX, textY);
-
-      // Timer
-      this.ctx.textAlign = "right";
-      const timerX = this.canvas.width - 20;
-      this.ctx.strokeText(`Time: ${this.gameState.timeLeft}s`, timerX, textY);
-      this.ctx.fillText(`Time: ${this.gameState.timeLeft}s`, timerX, textY);
-
-      // Target vegetable
-      this.ctx.textAlign = "center";
-      this.ctx.font = `${targetFontSize}px Arial`;
-      this.ctx.strokeText(
-        `Catch: ${this.gameState.targetVegetable.toUpperCase()}`,
-        this.canvas.width / 2,
-        textY
-      );
-      this.ctx.fillText(
-        `Catch: ${this.gameState.targetVegetable.toUpperCase()}`,
-        this.canvas.width / 2,
-        textY
-      );
-    }
+    // Target vegetable
+    this.ctx.textAlign = "center";
+    this.ctx.font = `${targetFontSize}px Arial`;
+    this.ctx.strokeText(
+      `Catch: ${this.gameState.targetVegetable.toUpperCase()}`,
+      this.canvas.width / 2,
+      textY
+    );
+    this.ctx.fillText(
+      `Catch: ${this.gameState.targetVegetable.toUpperCase()}`,
+      this.canvas.width / 2,
+      textY
+    );
   }
 
   setRandomTargetVegetable() {
