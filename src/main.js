@@ -36,6 +36,7 @@ k.loadSprite("bug", "graphics/motobug.png", {
   },
 });
 k.loadSound("jump", "/sounds/Jump.wav");
+k.loadSound("jungle", "/sounds/jungle.wav");
 k.loadSound("ring", "/sounds/Ring.wav");
 k.loadSound("hurt", "/sounds/Hurt.wav");
 k.loadSound("destroy", "/sounds/Destroy.wav");
@@ -54,6 +55,7 @@ k.scene("game", () => {
   const sonic = makeSonic(k.vec2(100, 100));
   sonic.setControls();
   sonic.setEvents();
+  const jungleSfx = k.play("jungle", { volume: 0.2, loop: true });
   k.setGravity(3100);
   const carrotCollectUI = sonic.add([
     k.text("", { size: 18, font: "mania" }),
@@ -192,11 +194,11 @@ k.scene("game", () => {
   sonic.onCollide("eggplant", (e) => {
     k.play("ring", { volume: 0.5 }); // Reusing ring sound
     k.destroy(e);
-    score += 2; // Eggplants worth more points
+    score++; // Eggplants now worth same as carrots (1 point)
     scoreText.text = `SCORE : ${score}`;
 
-    // Show +2 text when collecting an eggplant
-    carrotCollectUI.text = "+2";
+    // Show +1 text when collecting an eggplant
+    carrotCollectUI.text = "+1";
     k.wait(1, () => {
       carrotCollectUI.text = "";
     });
@@ -225,7 +227,7 @@ k.scene("game", () => {
     }
     k.play("hurt", { volume: 0.5 });
     k.setData("current-score", score);
-    k.go("game-over");
+    k.go("game-over", jungleSfx);
   });
   sonic.onGround(() => {
     scoreMul = 0;
