@@ -1,5 +1,5 @@
 import k from "./kaplayCtx";
-import { makeSonic, makeRing, makeEnemy, makeEggplant } from "./entities";
+import { makeSonic, makeCarrot, makeEnemy, makeEggplant } from "./entities";
 
 k.loadSprite("forest", "graphics/forest.jpg");
 k.loadSprite("platforms", "graphics/platforms.png");
@@ -12,7 +12,7 @@ k.loadSprite("sonic", "graphics/sonic.png", {
   },
 });
 
-k.loadSprite("ring", "graphics/carrot.png", {
+k.loadSprite("carrot", "graphics/carrot.png", {
   sliceX: 1, // this refers to number of columns in sprite image
   sliceY: 1, // this refers to number of rows in sprite image
   anims: {
@@ -55,7 +55,7 @@ k.scene("game", () => {
   sonic.setControls();
   sonic.setEvents();
   k.setGravity(3100);
-  const ringCollectUI = sonic.add([
+  const carrotCollectUI = sonic.add([
     k.text("", { size: 18, font: "mania" }),
     k.color(255, 255, 0),
     k.anchor("center"),
@@ -127,19 +127,19 @@ k.scene("game", () => {
     }
   });
 
-  const spawnRing = () => {
-    const ring = makeRing(k.vec2(1280, 610));
-    ring.onUpdate(() => {
-      // code to make the ring move or animate
-      ring.move(-gameSpeed, 0);
+  const spawnCarrot = () => {
+    const carrot = makeCarrot(k.vec2(1280, 610));
+    carrot.onUpdate(() => {
+      // code to make the carrot move or animate
+      carrot.move(-gameSpeed, 0);
     });
-    ring.onExitScreen(() => {
-      k.destroy(ring);
+    carrot.onExitScreen(() => {
+      k.destroy(carrot);
     });
     const waitTime = k.rand(0.5, 3);
-    k.wait(waitTime, spawnRing);
+    k.wait(waitTime, spawnCarrot);
   };
-  spawnRing();
+  spawnCarrot();
 
   const spawnEggplant = () => {
     // Position eggplants higher in the air (y value is lower)
@@ -166,7 +166,7 @@ k.scene("game", () => {
         motobug.move(-(gameSpeed + 300), 0);
         return;
       }
-      // code to make the ring move or animate
+      // code to make the enemy move or animate
       motobug.move(-gameSpeed, 0);
     });
     motobug.onExitScreen(() => {
@@ -177,15 +177,15 @@ k.scene("game", () => {
   };
   spawnBug();
 
-  sonic.onCollide("ring", (r) => {
+  sonic.onCollide("carrot", (r) => {
     k.play("ring", { volume: 0.5 });
     k.destroy(r);
     score++;
     scoreText.text = `SCORE : ${score}`;
 
-    ringCollectUI.text = "+1";
+    carrotCollectUI.text = "+1";
     k.wait(1, () => {
-      ringCollectUI.text = "";
+      carrotCollectUI.text = "";
     });
   });
 
@@ -196,9 +196,9 @@ k.scene("game", () => {
     scoreText.text = `SCORE : ${score}`;
 
     // Show +2 text when collecting an eggplant
-    ringCollectUI.text = "+2";
+    carrotCollectUI.text = "+2";
     k.wait(1, () => {
-      ringCollectUI.text = "";
+      carrotCollectUI.text = "";
     });
   });
 
@@ -213,13 +213,13 @@ k.scene("game", () => {
       score += 10 * scoreMul;
       scoreText.text = `SCORE : ${score}`;
       if (scoreMul === 1) {
-        ringCollectUI.text = `+${10 * scoreMul}`;
+        carrotCollectUI.text = `+${10 * scoreMul}`;
       }
       if (scoreMul > 1) {
-        ringCollectUI.text = `x${scoreMul}`;
+        carrotCollectUI.text = `x${scoreMul}`;
       }
       k.wait(1, () => {
-        ringCollectUI.text = "";
+        carrotCollectUI.text = "";
       });
       return;
     }

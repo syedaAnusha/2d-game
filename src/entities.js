@@ -38,16 +38,16 @@ export function makeSonic(position) {
   ]);
 }
 
-export function makeRing(position) {
+export function makeCarrot(position) {
   return k.add([
-    k.sprite("ring", { anim: "spin" }),
+    k.sprite("carrot", { anim: "spin" }),
     k.area(),
     k.scale(3),
     k.anchor("center"),
     k.pos(position),
     k.offscreen(),
     k.z(5),
-    "ring",
+    "carrot",
   ]);
 }
 
